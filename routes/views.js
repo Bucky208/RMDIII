@@ -9,12 +9,14 @@ module.exports = [
       name: 'Maxim De Groote',
       title: 'Audioworld'
     })
+
   },
 
   {
     method: 'GET',
     path: '/piano',
     handler: (request, reply) => reply.view('piano')
+
   }
 
 ];

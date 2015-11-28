@@ -2,7 +2,9 @@
 
 module.exports.register = (server, options, next) => {
 
+
   // console.log('Hello Plugin');
+
   next();
 
 };
