@@ -6,10 +6,39 @@
 // import 'babel-core/polyfill';
 // or import specific polyfills
 // import {$} from './helpers/util';
-import helloworldTpl from '../_hbs/helloworld';
+
+let scene, camera, renderer;
+let OrbitControls = require('three-orbit-controls')(THREE);
+
+const render = () => {
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(() => render());
+
+};
 
 const init = () => {
-  console.log(helloworldTpl({name: 'Maxim De Groote'}));
+
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(
+    45, window.innerWidth / window.innerHeight, 1, 10000
+  );
+
+  renderer = new THREE.WebGLRenderer();
+
+  renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+  );
+
+  new OrbitControls(camera);
+
+  document.querySelector('.append').appendChild(renderer.domElement);
+
+  console.log(renderer);
+
+  camera.position.z = 1500;
+  render();
 };
 
 init();
