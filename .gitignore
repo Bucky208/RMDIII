@@ -1,3 +1,5 @@
 /node_modules
 .env
 npm-debug.log
+RMD3_MATH_RANDOM.pdf
+.DS_Store
