@@ -28,21 +28,4 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.js"></script>
   <script src="/js/script.js"></script>
-
-  <script type="text/javascript">
-            var currentsong = "game_of_thrones.mid";
-
-            window.onload = function ()
-            {
-                MIDI.loadPlugin(function ()
-                {
-                    //autostart MIDI.Player.loadFile(song[0], MIDI.Player.start);
-                    MIDI.Player.loadFile("midi/" + currentsong, MIDI.Player.start);
-                    MIDI.Player.timeWarp = 1.0;
-                    //MIDI.Player.loadFile("midi/" + currentsong);
-                    //var songnameElement = document.getElementById("songtitle");
-                    //songnameElement.innerHTML = currentsong;
-                });
-            };
-        </script>
 {{/section}}

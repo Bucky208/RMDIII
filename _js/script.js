@@ -6,15 +6,41 @@
 // import 'babel-core/polyfill';
 // or import specific polyfills
 // import {$} from './helpers/util';
-
-let scene, camera, renderer;
+let scene, camera, renderer, shape;
 let OrbitControls = require('three-orbit-controls')(THREE);
+let currentsong = 'mario_-_overworld_theme.mid';
+
+const box = () => {
+
+  let geometry = new THREE.BoxGeometry(31, 31, 31);
+
+  let material = new THREE.MeshBasicMaterial({
+    color: 'orange'
+  });
+
+  shape = new THREE.Mesh(geometry, material);
+  scene.add(shape);
+
+  camera.position.z = 100;
+};
 
 const render = () => {
 
   renderer.render(scene, camera);
   requestAnimationFrame(() => render());
 
+};
+
+const sound = () => {
+  MIDI.loadPlugin(function () {
+    MIDI.Player.loadFile('midi/' + currentsong, MIDI.Player.start);
+    MIDI.Player.timeWarp = 1.0;
+    MIDI.Player.addListener(function(data) {
+      var note = data.note;
+      console.log(note);
+      shape.scale.set( 1, 31/note*2, 1 );
+    });
+  });
 };
 
 const init = () => {
@@ -37,7 +63,10 @@ const init = () => {
 
   console.log(renderer);
 
-  camera.position.z = 1500;
+  sound();
+
+  box();
+
   render();
 };
 
