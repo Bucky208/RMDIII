@@ -12,22 +12,30 @@
 
 let socket;
 let soundbox = true;
+let currentsong = 'game_of_thrones.mid';
+
+$("#currentsong").text(currentsong);
 
 $( '#demo' ).click(() => {
-  //playNote(50);
   socket.emit('joined', 50 );
 });
 
 $( '#soundbox' ).click(() => {
-  //playNote(50);
   soundbox = true;
   console.log(soundbox);
 });
 
 $( '#piano' ).click(() => {
-  //playNote(50);
   soundbox = false;
   console.log(soundbox);
+});
+
+$( '#startsong' ).click(() => {
+  soundreader();
+});
+
+$( '#stopsong' ).click(() => {
+  MIDI.Player.stop();
 });
 
 $( '#uname' ).change(() => {
@@ -53,8 +61,8 @@ const init = () => {
       // handle input
       let note = keyCodeToNote(e.keyCode);
       console.log(note);
-      addCirkel();
       if (note !== -1 && !$('#uname').is(':focus')) {
+        addCirkel();
         playNote(note);
         socket.emit('joined', note );
       }
@@ -81,6 +89,10 @@ let topcanvas = document.createElement('canvas');
 let ctx = canvas.getContext('2d');
 let ctxS = topcanvas.getContext('2d');
 
+ctxS.fillStyle = '#000';
+ctxS.rect(0, 0, canvas.width, canvas.height);
+ctxS.fill();
+
 window.addEventListener('resize', resizeCanvas, false);
 
 const resizeCanvas = () => {
@@ -94,8 +106,8 @@ let circles = [];
 
 const addCirkel = () => {
   let colour = '#' + Math.floor(Math.random() * 16777215).toString(16); //16777215 is the decimal value of #FFFFFF
-  let xval = Math.random() * 450;
-  let yval = Math.random() * 450;
+  let xval = Math.random() * canvas.width;
+  let yval = Math.random() * canvas.height;
 
   circles.unshift({
     x: xval,
@@ -115,7 +127,7 @@ const circ = (x, y, rad, c) => {
 };
 
 const resetcanvas = () => {
-  ctxS.fillStyle = '#FFFFFF';
+  ctxS.fillStyle = '#000';
   ctxS.rect(0, 0, canvas.width, canvas.height);
   ctxS.fill();
 };
@@ -124,11 +136,11 @@ const draw = () => {
   resetcanvas();
   for (let i = circles.length - 1; i >= 0; --i) {
     if(circles[i].radius < 100 && circles[i].radius > 0 && circles[i].grow) {
-      circ(circles[i].x, circles[i].y, circles[i].radius +4, '#FFFFFF');
+      circ(circles[i].x, circles[i].y, circles[i].radius +4, '#000');
       circ(circles[i].x, circles[i].y, circles[i].radius, circles[i].colour);
       circles[i].radius += 3;
     } else if (circles[i].radius > 0){
-      circ(circles[i].x, circles[i].y, circles[i].radius +4, '#FFFFFF');
+      circ(circles[i].x, circles[i].y, circles[i].radius +4, '#000');
       circ(circles[i].x, circles[i].y, circles[i].radius, circles[i].colour);
       circles[i].grow = false;
       circles[i].radius -= 3;
@@ -147,6 +159,17 @@ requestAnimationFrame(draw);
 const playNote = (note) => {
   MIDI.noteOn(0, note, 127, 0);
   MIDI.noteOff(0, note, 0.75);
+};
+
+const soundreader = () => {
+  MIDI.loadPlugin(function () {
+    MIDI.Player.loadFile('midi/' + currentsong, MIDI.Player.start);
+    MIDI.Player.timeWarp = 1.0;
+    MIDI.Player.addListener(function(data) {
+      var note = data.note;
+      socket.emit('joined', note );
+    });
+  });
 };
 
 const keyCodeToNote = (keyCode) => {
