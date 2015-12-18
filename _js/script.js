@@ -12,9 +12,10 @@
 
 let socket;
 let soundbox = true;
+let record = false;
 let currentsong = 'game_of_thrones.mid';
-
-$("#currentsong").text(currentsong);
+let timeoutplay;
+$('#currentsong').text(currentsong);
 
 $( '#demo' ).click(() => {
   socket.emit('joined', 50 );
@@ -38,6 +39,29 @@ $( '#stopsong' ).click(() => {
   MIDI.Player.stop();
 });
 
+$( '#startrecord' ).click(() => {
+  starttimer();
+  console.log('timer gestart');
+  record = true;
+});
+
+$( '#stoprecord' ).click(() => {
+  stoptimer();
+  record = false;
+  $('#recordcontrols').hide();
+});
+
+$( '#playrecord' ).click(() => {
+  playarray();
+  timeoutplay = setInterval(playarray, 10);
+  time = 0;
+  updaternotes = setInterval(timer, 100);
+});
+
+$( '#reload' ).click(() => {
+  location.reload();
+});
+
 $( '#uname' ).change(() => {
   console.log('run');
   socket.emit('changename', $( '#uname' ).val() );
@@ -53,7 +77,7 @@ const init = () => {
 
 
   socket = io('http://localhost:3000');
-  // socket = io('http://192.168.1.45:3000');
+  //rgsfusdfsd socket = io('http://192.168.1.45:3000');
 
   socket.on('connect', client => {
 
@@ -156,9 +180,54 @@ const draw = () => {
 requestAnimationFrame(draw);
 //stop cirkels
 
+let time = 0;
+let updaternotes;
+let currentnote = 1;
+let currentomgekeerdenote;
+const starttimer = () => {
+  time = 0;
+  updaternotes = setInterval(timer, 100);
+};
+
+const stoptimer = () => {
+  clearInterval(updaternotes);
+  console.log(noten);
+  $('#eigensongcontrol').show();
+};
+
+const timer = () => {
+  time++;
+};
+
+let noten = [];
+
+const addNote = (note) => {
+  noten.unshift({
+    noot: note,
+    time: time
+  });
+};
+
+const playarray = () => {
+  currentomgekeerdenote = (noten.length - currentnote);
+
+  if(noten[currentomgekeerdenote].time === time) {
+    playNote(noten[currentomgekeerdenote].noot);
+    addCirkel();
+    currentnote++;
+  }
+  if(noten.length === (currentnote -1)) {
+    clearInterval(timeoutplay);
+    time = 0;
+  }
+};
+
 const playNote = (note) => {
+  if(record) {
+    addNote(note);
+  }
   MIDI.noteOn(0, note, 127, 0);
-  MIDI.noteOff(0, note, 0.75);
+  MIDI.noteOff(0, note, 0.5);
 };
 
 const soundreader = () => {
