@@ -76,7 +76,7 @@ const init = () => {
   });
 
 
-  socket = io('http://localhost:3000');
+  socket = io('http://rmdiii.herokuapp.com');
   //rgsfusdfsd socket = io('http://192.168.1.45:3000');
 
   socket.on('connect', client => {
